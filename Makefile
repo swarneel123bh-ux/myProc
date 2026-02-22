@@ -1,49 +1,49 @@
-# Tell make to use cmd.exe
-SHELL = cmd
-.SHELLFLAGS = /C
+TOP := Proctb
 
-# Tools
-IVERILOG = iverilog
-VVP      = vvp
-GTKWAVE  = gtkwave
+SRC_DIR := src
+TB_DIR := tb
+BUILD_DIR := build
 
-# Find testbenches (*tb.v)
-TB_FILES := $(wildcard *tb.v)
+OUT := $(BUILD_DIR)/$(TOP).vvp
+WAVE := $(BUILD_DIR)/$(TOP).vcd
 
-# footb.v -> foo.vvp
-TARGETS := $(patsubst %tb.v,%.vvp,$(TB_FILES))
+IVERILOG := iverilog
+VVP := vvp
+GTKWAVE := gtkwave
 
-# Default: build all
-all: $(TARGETS)
+COMMON_FLAGS := -g2012 -Wall
 
-# Build rule
-# foo.vvp depends on foo.v and footb.v
-%.vvp: %.v %tb.v
-	$(IVERILOG) -g2012 -Wall -o $@ $^
-
-# Run simulation
-# Usage: make run name=foo
-run:
-ifndef name
-	$(error Usage: make run name=<modulename>)
+ifeq ($(OS),Windows_NT)
+	RM := rmdir /s /q
+	MKDIR := if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	NULLDEV := NUL
+else
+	RM := rm -rf
+	MKDIR := mkdir -p $(BUILD_DIR)
+	NULLDEV := /dev/null
 endif
-	$(VVP) $(name).vvp
 
-# Open waveform in GTKWave
-# Usage: make wave name=foo
-wave:
-ifndef name
-	$(error Usage: make wave name=<modulename>)
-endif
-	if not exist $(name).vcd ( \
-		echo VCD file $(name).vcd not found. Run simulation first. & \
-		exit /b 1 \
-	)
-	$(GTKWAVE) $(name).vcd
+SRC := $(wildcard $(SRC_DIR)/*.v *.v) $(TB_DIR)/$(TOP).v
 
-# Clean
+.PHONY: all run wave clean rebuild list
+
+all: $(OUT)
+
+$(OUT): $(SRC)
+	@$(MKDIR)
+	$(IVERILOG) $(COMMON_FLAGS) -o $(OUT) $(SRC)
+
+run: $(OUT)
+	$(VVP) $(OUT)
+
+wave: $(OUT)
+	$(VVP) $(OUT)
+	$(GTKWAVE) $(WAVE)
+
 clean:
-	del /Q *.vvp 2>nul
-	del /Q *.vcd 2>nul
+	@$(RM) $(BUILD_DIR) 2>$(NULLDEV)
 
-.PHONY: all run wave clean
+rebuild: clean all
+
+list:
+	@echo $(SRC)
