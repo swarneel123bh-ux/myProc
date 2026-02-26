@@ -1,0 +1,43 @@
+$date
+	Thu Feb 26 13:49:47 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module cutb $end
+$var wire 2 ! aluCtrl [1:0] $end
+$var reg 32 " instr [31:0] $end
+$scope module uut $end
+$var wire 2 # aluCtrl [1:0] $end
+$var wire 32 $ instr [31:0] $end
+$var reg 2 % aluCtrl_ [1:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b0 %
+b100010000110100000000 $
+b0 #
+b100010000110100000000 "
+b0 !
+$end
+#3
+b1 !
+b1 #
+b1 %
+b100001000100000000000010101 "
+b100001000100000000000010101 $
+#6
+b0 !
+b0 #
+b0 %
+b100010000110100000000 "
+b100010000110100000000 $
+#9
