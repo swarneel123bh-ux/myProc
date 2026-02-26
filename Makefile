@@ -4,14 +4,17 @@ SRC_DIR := src
 TB_DIR := tb
 BUILD_DIR := build
 
-OUT := $(BUILD_DIR)/$(TOP).vvp
-WAVE := $(BUILD_DIR)/$(TOP).vcd
-
 IVERILOG := iverilog
 VVP := vvp
 GTKWAVE := gtkwave
 
 COMMON_FLAGS := -g2012 -Wall
+
+# Select target (priority: name > TOP)
+TARGET := $(if $(name),$(name),$(TOP))
+
+OUT := $(BUILD_DIR)/$(TARGET).vvp
+WAVE := $(BUILD_DIR)/$(TARGET).vcd
 
 ifeq ($(OS),Windows_NT)
 	RM := rmdir /s /q
@@ -23,7 +26,8 @@ else
 	NULLDEV := /dev/null
 endif
 
-SRC := $(wildcard $(SRC_DIR)/*.v *.v) $(TB_DIR)/$(TOP).v
+# All source files + selected testbench
+SRC := $(wildcard $(SRC_DIR)/*.v *.v) $(TB_DIR)/$(TARGET).v
 
 .PHONY: all run wave clean rebuild list
 
@@ -46,4 +50,5 @@ clean:
 rebuild: clean all
 
 list:
-	@echo $(SRC)
+	@echo "Target: $(TARGET)"
+	@echo "Sources: $(SRC)"
