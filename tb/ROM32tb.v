@@ -10,7 +10,7 @@ module ROM32tb();
     );
 
     initial begin
-        $dumpfile("build/ROM32.vcd");   // Name of output file
+        $dumpfile("build/ROM32tb.vcd");   // Name of output file
         $dumpvars(0, ROM32tb);
         ce = 1;
         addr = 0; #1;

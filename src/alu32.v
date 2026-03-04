@@ -8,6 +8,13 @@ module alu32(
 	reg [31:0] Out_;		// Operation result
 	reg zflg_, ovflg_, brwflg_, negflg_; // Output characteristic flags
 
+  initial begin
+    zflg_ = 0;
+    ovflg_ = 0;
+    brwflg_ = 0;
+    negflg_ = 0;
+  end
+
 	always @(*) begin
 		case (Ctrl)
 			// OR reg3, reg1, reg2 -> A = reg1, B = reg2

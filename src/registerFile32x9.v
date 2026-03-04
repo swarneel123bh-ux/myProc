@@ -1,7 +1,7 @@
 module registerFile32x9(
     input [3:0] readAddr1, readAddr2, writeAddr,
     input [31:0] writeData,
-    input writeEnable, resetb,
+    input writeEnable, resetb, clk,
     output [31:0] readData1, readData2
 );
 
@@ -14,8 +14,8 @@ module registerFile32x9(
         end
     end
 
-    always @(posedge writeEnable) begin
-        if (writeAddr < 9) begin
+    always @(posedge clk) begin
+        if ((writeAddr < 9) && (writeEnable == 1)) begin
             registers[writeAddr] = writeData;
         end 
     end
@@ -27,7 +27,7 @@ module registerFile32x9(
         end
     end
 
-    assign readData1 = (readAddr1 < 9) ? registers[readAddr1] : 32'h00000000;
-    assign readData2 = (readAddr2 < 9) ? registers[readAddr2] : 32'h00000000;
+    assign readData1 = (readAddr1 < 9) ? registers[readAddr1] : 32'hxxxxxxxx;
+    assign readData2 = (readAddr2 < 9) ? registers[readAddr2] : 32'hxxxxxxxx;
 
 endmodule

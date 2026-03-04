@@ -1,11 +1,9 @@
 module Proctb();
 
     reg reset;
-    wire [31:0] instr;
 
     Proc uut(
-        .reset(reset),
-        .instr(instr)
+        .reset(reset)
     );
 
     initial begin

@@ -19,6 +19,8 @@ module alu32tb();
 		A = 0; B = 0; Ctrl = 0; #3;		// OR
 		A = 10; B = 5; Ctrl = 0; #3;	// OR
 
+    A = 0; B = 5; Ctrl = 1; #3; // SUBI
+
 		// OTHER INSTRUCTIONS NOT IMPLEMENTED YET
 
 		$finish;

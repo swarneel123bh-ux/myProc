@@ -6,27 +6,31 @@ module ROM32(
 
     reg [31:0] ROM_ [0:31];
 
+    integer i;
+
     // Program 
     initial begin
-        ROM_[0] = 32'hFEEDBEEF;
-        ROM_[1] = 32'hDEEFFFEB;
-        ROM_[2] = 32'hABACADAB;
-        ROM_[3] = 32'hFEEDBEEF;
-        ROM_[4] = 32'hDEEFFFEB;
-        ROM_[5] = 32'hABACADAB;
-        ROM_[6] = 32'hFEEDBEEF;
-        ROM_[7] = 32'hDEEFFFEB;
-        ROM_[8] = 32'hABACADAB;
-        ROM_[9] = 32'hDEEFFFEB;
-        ROM_[10] = 32'hABACADAB;
+
+        for (i = 0; i < 32; i = i + 1) begin
+          ROM_[i]  = 32'h00000000;
+        end
+
+        // OR $1, $2, $3 => $1 = $2 | $3;
+        ROM_[0] = 32'b00000000001000100001100000000000;
+        // SUBI $1, $2, 21 => $1 = $2 - 21;
+        ROM_[1] = 32'h04220015;
+        // SUBI $2, $1, 0xFFFFFFEA => $1 = $2 - 0xFFFFFFEA; -> Answer will be 1
+        ROM_[2] = 32'b00000100010000101111111111101010;
+        // OR $3, $1, $2 => $4 = $1 | $7
+        ROM_[3] = 32'b00000000011000010001000000000000;
     end
 
     reg [31:0] out_;
 
-    always @(addr) begin
-        if (ce == 1) begin
-            out_ = ROM_[addr[31:2]];
-        end else begin out_ = 32'hzzzzzzzz; end
+    always @(*) begin
+      if (ce == 1) begin
+        out_ = (addr < 11) ? ROM_[addr] : 32'hx;
+      end
     end
 
     assign out = out_;
