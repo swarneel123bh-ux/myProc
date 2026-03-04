@@ -3,7 +3,7 @@ module cutb();
   reg  [31:0] instr;
   wire [1:0] aluCtrl;
   wire [3:0] regFileReadAddr1, regFileReadAddr2, regFileWriteAddr;
-  wire regFileWriteEnable, aluSrc;
+  wire regFileWriteEnable, aluSrc, RAMEnable, RAMWriteEnable;
 
   cu uut(
     .instr(instr),
@@ -11,7 +11,7 @@ module cutb();
     .regFileWriteAddr(regFileWriteAddr),
     .regFileWriteEnable(regFileWriteEnable),
     .regFileReadAddr1(regFileReadAddr1), .regFileReadAddr2(regFileReadAddr2),
-    .aluSrc(aluSrc)
+    .aluSrc(aluSrc), .RAMEnable(RAMEnable), .RAMWriteEnable(RAMWriteEnable)
   );
 
   initial begin
@@ -31,9 +31,14 @@ module cutb();
     instr = 32'b00000100010000101111111111101010;
     #3;
 
+    // SW $6, 10($1) -> Load dataMem from Addr[<$1> + 10] into $6
+    instr = 32'b00001000110000010000000000000000;
+    #3;
+
     // OR $3, $1, $2 => $4 = $1 | $7
     instr = 32'b00000000011000010001000000000000;
     #3;
+
 
     $finish;
   end

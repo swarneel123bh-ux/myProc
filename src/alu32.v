@@ -18,18 +18,22 @@ module alu32(
 	always @(*) begin
 		case (Ctrl)
 			// OR reg3, reg1, reg2 -> A = reg1, B = reg2
+      // BITWISE LOGICAL OR operation
 			4'b00: begin
 				Out_ = A | B;
 			end
 			// SUBI reg4, reg5, 21 -> A = reg5, B = 21
+      // SUBTRACT operation
 			4'b01: begin
 				Out_  = A - B;
 			end
 			// SW reg6, 5 (reg7) -> ???
+      // ADD operation
 			4'b10: begin
-				Out_ = 0;	// Setting to 0 for now
+				Out_ = A + B;	// Setting to 0 for now
 			end
 			// BEQ reg9, reg8, 7 -> ???
+      // WHAT OPERATION????
 			4'b11:begin
 				Out_ = 0; // Setting to 0 for now
 			end
