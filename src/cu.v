@@ -3,14 +3,14 @@ module cu (
     output [1:0] aluCtrl,
     output [3:0] regFileReadAddr1, regFileReadAddr2, regFileWriteAddr,
     output aluSrc, regFileWriteEnable, RAMWriteEnable,
-    aluOut_dataMemOut_select, RAMEnable
+    aluOut_dataMemOut_select, RAMEnable, BranchFlg
 );
 
   reg [1:0] aluCtrl_;
   reg regFileWriteEnable_, RAMWriteEnable_;
   reg [3:0] regFileWriteAddr_;
   reg [3:0] regFileReadAddr1_, regFileReadAddr2_;
-  reg aluSrc_, aluOut_dataMemOut_select_, RAMEnable_;
+  reg aluSrc_, aluOut_dataMemOut_select_, RAMEnable_, BranchFlg_;
 
   // OR outreg3, inreg1, inreg2 -> R-type
   // SUBI outreg4, inreg5, immval21 -> I-type
@@ -31,6 +31,7 @@ module cu (
         aluOut_dataMemOut_select_ = 0;
         RAMEnable_ = 0;
         RAMWriteEnable_ = 0;
+        BranchFlg_ = 0;
       end
       // I-type
       // 000001 5'b<Rd> 5'b<rS> 16'b<ImmVal>
@@ -44,6 +45,7 @@ module cu (
         aluOut_dataMemOut_select_ = 0;
         RAMEnable_ = 0;
         RAMWriteEnable_ = 0;
+        BranchFlg_ = 0;
       end
 
       // SW destReg, <ImmVal>(srcAddrReg)
@@ -62,6 +64,25 @@ module cu (
         aluOut_dataMemOut_select_ = 1;
         RAMEnable_ = 1;
         RAMWriteEnable_ = 0;
+        BranchFlg_ = 0;
+      end
+      
+      // BEQ <[destAddrReg]> <[value1Register]> <ImmVal2>
+      // 000011 5'b<RegisterNumber_A> 5'b<RegisterNumber_B> 16'b<ImmVal=>OFFSET>
+      // IF A == B THEN SHIFT PC+4 to PC+4+OFFSET (OFFSET CALCULTAED BY ASSEMBLER)
+      // ALU needs to do SUBI operation on RegisterNumber_A and ImmVal
+      6'b000011:begin
+        aluCtrl_ = 2'b10;
+        regFileWriteEnable_ = 0;
+        regFileWriteAddr_ = 5'bzzzzz;
+        regFileReadAddr1_ = instr[25:21];
+        regFileReadAddr2_ = instr[20:16];
+        aluSrc_ = 0;
+        RAMWriteEnable_ = 0; 
+        aluOut_dataMemOut_select_ = 0;
+        RAMEnable_ = 0;
+        RAMWriteEnable_ = 0;
+        BranchFlg_ = 1;
       end
 
       default: begin
@@ -84,5 +105,6 @@ module cu (
   assign RAMWriteEnable = RAMWriteEnable_;
   assign aluOut_dataMemOut_select = aluOut_dataMemOut_select_;
   assign RAMEnable = RAMEnable_;
+  assign BranchFlg = BranchFlg_;
 
 endmodule

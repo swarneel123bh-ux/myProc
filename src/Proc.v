@@ -22,7 +22,7 @@ module Proc (
     wire [1:0] aluCtrl_;
     wire [3:0] regFileReadAddr1_, regFileReadAddr2_, regFileWriteAddr_;
     wire aluSrc_, regFileWriteEnable_, RAMWriteEnable_, 
-      aluOut_dataMemOut_select, RAMEnable_;
+      aluOut_dataMemOut_select, RAMEnable_, BranchFlg_;
 
     // For arithmetic logic unit ALU
 	  wire [31:0] aluOut_;		// Operation result
@@ -37,7 +37,8 @@ module Proc (
     // For sign-extender SIGNEXTEND16_32
     wire [31:0] aluImmVal;
 
-
+    // For branch calculator circuit
+    wire [31:0] pcBranchOffset_;
 
 
 
@@ -50,9 +51,10 @@ module Proc (
 
     // MODULE DECLARATIONS
     // Adder for the program counter
+    wire [31:0] pcIntermid;
     add32 pcAdder(
         .A(pcOp), .B(32'h00000004), .Cin(1'b0),
-        .Sum(pcIp), .Cout(pcCout)
+        .Sum(pcIntermid), .Cout(pcCout)
     );
 
     register32 PC(
@@ -72,7 +74,8 @@ module Proc (
       .regFileReadAddr1(regFileReadAddr1_), .regFileReadAddr2(regFileReadAddr2_),
       .aluSrc(aluSrc_), .RAMWriteEnable(RAMWriteEnable_), 
       .aluOut_dataMemOut_select(aluOut_dataMemOut_select),
-      .RAMEnable(RAMEnable_)
+      .RAMEnable(RAMEnable_),
+      .BranchFlg(BranchFlg_)
     );
 
     MUX2x1_32 ALU_DATAMEM_MUX(
@@ -112,6 +115,18 @@ module Proc (
       .addr(aluOut_), .dataIn(regFileReadData2_),
       .clk(clk), .writeEnable(RAMWriteEnable_),
       .dataOut(dataMemoryOut_), .enable(RAMEnable_)
+    );
+    
+    MUX2x1_32 PC_BRANCH_MUX(
+        .select(((BranchFlg_ && zflg) == 1) ? 1'b1 : 1'b0),
+        .inp0(pcIntermid), .inp1(pcBranchOffset_),
+        .out(pcIp)
+    );
+    
+    
+    add32 branchOffsetCalculator(
+        .A(pcIntermid), .B(aluImmVal << 2), .Cin(1'b0),
+        .Sum(pcBranchOffset_), .Cout(pcCout)
     );
 
 endmodule
